@@ -234,16 +234,16 @@ void abrirConsultorio() {
     }
 }
 
-void fecharConsultorio(int consultorio) {
-    if (num_consultorios > MIN_CONSULTORIOS && consultorio >= 1 && consultorio <= num_consultorios) {
-        printf("Consultorio %d fechado!\n", consultorio);
-        fprintf(historico, "FECHADO CONSULTORIO %d\n", consultorio);
+void fecharConsultorio() {
+    if (num_consultorios > MIN_CONSULTORIOS) {
+        printf("Consultorio fechado!\n");
+        fprintf(historico, "FECHADO CONSULTORIO \n");
         
         // Realocação dos pacientes para outro consultório
         for (int i = 0; i < num_consultorios; i++) {
-            if (i != consultorio - 1) {
-                Heap* filaP = consultorios[consultorio - 1].fila_prioritaria;
-                Heap* filaNP = consultorios[consultorio - 1].fila_nao_prioritaria;
+            if (i != num_consultorios - 1) {
+                Heap* filaP = consultorios[num_consultorios - 1].fila_prioritaria;
+                Heap* filaNP = consultorios[num_consultorios - 1].fila_nao_prioritaria;
                 
                 if (filaP->cabeca != NULL) {
                     consultorios[i].fila_prioritaria->cabeca = uniao(consultorios[i].fila_prioritaria, filaP)->cabeca;
@@ -251,6 +251,7 @@ void fecharConsultorio(int consultorio) {
                 if (filaNP->cabeca != NULL) {
                     consultorios[i].fila_nao_prioritaria->cabeca = uniao(consultorios[i].fila_nao_prioritaria, filaNP)->cabeca;
                 }
+                break;
             }
         }
         num_consultorios--;

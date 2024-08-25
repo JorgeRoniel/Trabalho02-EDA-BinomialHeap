@@ -42,9 +42,7 @@ int main() {
                 abrirConsultorio();
                 break;
             case 4:
-                printf("Informe o numero do consultorio a ser fechado (1-%d): ", num_consultorios);
-                scanf("%d", &consultorio);
-                fecharConsultorio(consultorio);
+                fecharConsultorio();
                 break;
             case 5:
                 exibirEstadoConsultorios();
