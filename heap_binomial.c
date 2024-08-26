@@ -234,26 +234,53 @@ void abrirConsultorio() {
     }
 }
 
+int contarPacientes(Heap* fila) {
+    int contador = 0;
+    No* atual = fila->cabeca;
+    while (atual != NULL) {
+        contador++;
+        atual = atual->irmao;
+    }
+    return contador;
+}
+
+void transferirPacientes(Consultorio* consultorioOrigem, Consultorio* consultorioDestino) {
+    while (consultorioOrigem->fila_prioritaria->cabeca != NULL) {
+        int chave = extractMin(consultorioOrigem->fila_prioritaria);
+        insert(consultorioDestino->fila_prioritaria, chave);
+    }
+
+    while (consultorioOrigem->fila_nao_prioritaria->cabeca != NULL) {
+        int chave = extractMin(consultorioOrigem->fila_nao_prioritaria);
+        insert(consultorioDestino->fila_nao_prioritaria, chave);
+    }
+}
+
 void fecharConsultorio() {
     if (num_consultorios > MIN_CONSULTORIOS) {
         printf("Consultorio fechado!\n");
         fprintf(historico, "FECHADO CONSULTORIO \n");
         
-        // Realocação dos pacientes para outro consultório
+        int menorConsultorio = -1;
+        int menorNumeroPacientes = INT_MAX;
+
+        // Encontrar o consultório com o menor número de pacientes
         for (int i = 0; i < num_consultorios; i++) {
             if (i != num_consultorios - 1) {
-                Heap* filaP = consultorios[num_consultorios - 1].fila_prioritaria;
-                Heap* filaNP = consultorios[num_consultorios - 1].fila_nao_prioritaria;
-                
-                if (filaP->cabeca != NULL) {
-                    consultorios[i].fila_prioritaria->cabeca = uniao(consultorios[i].fila_prioritaria, filaP)->cabeca;
+                int numPacientes = contarPacientes(consultorios[i].fila_prioritaria) +
+                                   contarPacientes(consultorios[i].fila_nao_prioritaria);
+                if (numPacientes < menorNumeroPacientes) {
+                    menorNumeroPacientes = numPacientes;
+                    menorConsultorio = i;
                 }
-                if (filaNP->cabeca != NULL) {
-                    consultorios[i].fila_nao_prioritaria->cabeca = uniao(consultorios[i].fila_nao_prioritaria, filaNP)->cabeca;
-                }
-                break;
             }
         }
+
+        if (menorConsultorio != -1) {
+            // Transferir pacientes para o consultório com o menor número de pacientes
+            transferirPacientes(&consultorios[num_consultorios - 1], &consultorios[menorConsultorio]);
+        }
+
         num_consultorios--;
     } else {
         printf("Nao e possivel fechar mais consultorios!\n");
